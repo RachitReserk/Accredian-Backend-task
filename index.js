@@ -18,12 +18,21 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+const isValidEmail = (email) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
 app.post("/api/referrals", async (req, res) => {
   try {
     const { name, email, referralCode } = req.body;
 
     if (!name || !email || !referralCode) {
       return res.status(400).json({ error: "All required fields must be filled." });
+    }
+
+    if (!isValidEmail(email)) {
+      return res.status(400).json({ error: "Invalid email format." });
     }
 
     const referral = await prisma.referral.create({
